@@ -2,83 +2,81 @@
 
 ## 앱 목적
 
-자동전투로 진행되는 로그라이크 던전 RPG — 플레이어의 판단(스킬 발동·타겟 지정)이 결과를 결정한다.
+자동전투로 진행되는 로그라이크 던전 RPG.
+플레이어의 판단(스킬 발동·타겟 지정)이 결과를 결정한다.
+
+---
+
+## 플랫폼
+
+**Flutter (Dart)** — iOS / Android 동시 지원
+- 근거: [ADR-0001](./../.planning/decisions/ADR-0001-mobile-framework.md)
 
 ---
 
 ## 레이어 구조
 
-Layered Architecture + MVVM 패턴 채택. (근거: ADR-0002)
-
-| 레이어 | 역할 | 이 게임 예시 | Unity 폴더 |
-|--------|------|------------|-----------|
-| **Presentation** | 화면 렌더링·유저 입력 | 전투 UI, 던전 맵, 메타 진행 화면 | `Assets/Scenes`, `Assets/UI` |
-| **ViewModel** | 상태 관리·화면 로직 | BattleViewModel, DungeonViewModel | `Assets/Scripts/ViewModels` |
-| **Domain** | 핵심 게임 비즈니스 규칙 | 자동전투 엔진, 절차적 던전 생성 | `Assets/Scripts/Domain` |
-| **Data** | 저장·불러오기·데이터 정의 | SaveManager, ScriptableObject | `Assets/Scripts/Data`, `Assets/SO` |
-
-> 의존성 방향: Presentation → ViewModel → Domain → Data (역방향 금지)
-
----
-
-## 시스템 다이어그램
-
 ```mermaid
 flowchart TD
-    Player([플레이어 터치 입력])
-
-    subgraph Presentation
-        BS[BattleScreen]
-        DS[DungeonScreen]
-        MS[MetaScreen]
+    subgraph P["🖥️ Presentation"]
+        direction LR
+        S1[MainMenuScreen]
+        S2[DungeonScreen]
+        S3[BattleHUD]
+        S4[MetaScreen]
     end
 
-    subgraph ViewModel
-        BVM[BattleViewModel]
-        DVM[DungeonViewModel]
-        MVM[MetaViewModel]
+    subgraph VM["⚙️ ViewModel"]
+        direction LR
+        V1[DungeonViewModel]
+        V2[BattleViewModel]
+        V3[MetaViewModel]
     end
 
-    subgraph Domain
-        ABE[AutoBattleEngine]
-        DG[DungeonGenerator]
-        BC[BalanceConfig]
+    subgraph D["🧠 Domain"]
+        direction LR
+        D1[DungeonGenerator]
+        D2[AutoBattleEngine]
+        D3[BalanceConfig]
     end
 
-    subgraph Data
-        SM[SaveManager]
-        SO[(ScriptableObject)]
+    subgraph DA["💾 Data"]
+        direction LR
+        DA1[SaveRepository]
+        DA2[LocalDataSource]
     end
 
-    Player --> BS
-    BS --> BVM
-    DS --> DVM
-    MS --> MVM
+    P  -->|"이벤트 전달"| VM
+    VM -->|"유스케이스 호출"| D
+    D  -->|"저장 / 읽기"| DA
 
-    BVM --> ABE
-    DVM --> DG
-    MVM --> SM
-
-    ABE --> BC
-    DG --> BC
-    ABE --> SM
-    SM --> SO
+    style P  fill:#FAECE7,stroke:#D85A30,color:#712B13
+    style VM fill:#EEEDFE,stroke:#7F77DD,color:#3C3489
+    style D  fill:#E1F5EE,stroke:#1D9E75,color:#085041
+    style DA fill:#FAEEDA,stroke:#EF9F27,color:#633806
 ```
 
 ---
 
-## 사용자 액션 → 저장까지 흐름
+## 사용자 액션 흐름
 
-**예시: 플레이어가 전투 중 스킬을 발동**
+> 플레이어가 전투 중 스킬을 발동하는 순간
 
-```
-1. BattleScreen.cs      [Presentation]  터치 입력 이벤트 수신
-        ↓
-2. BattleViewModel.cs   [ViewModel]     스킬 발동 가능 여부 판단, 쿨타임 상태 갱신
-        ↓
-3. AutoBattleEngine.cs  [Domain]        데미지 계산, 버프/디버프 적용, 타겟 선정 로직
-        ↓
-4. SaveManager.cs       [Data]          런 결과 JSON 저장, 메타 해금 데이터 갱신
+```mermaid
+sequenceDiagram
+    actor 플레이어
+    participant BattleHUD     as BattleHUD<br/>(Presentation)
+    participant BattleVM      as BattleViewModel<br/>(ViewModel)
+    participant BattleEngine  as AutoBattleEngine<br/>(Domain)
+    participant SaveRepo      as SaveRepository<br/>(Data)
+
+    플레이어  ->> BattleHUD    : 스킬 버튼 탭
+    BattleHUD ->> BattleVM    : onSkillTapped(skillId)
+    BattleVM  ->> BattleEngine: executeSkill(skillId, target)
+    BattleEngine -->> BattleVM: DamageResult
+    BattleVM  -->> BattleHUD  : state 갱신 (Provider)
+    BattleEngine ->> SaveRepo : flushRunState()
+    SaveRepo  -->> BattleEngine: 저장 완료
 ```
 
 ---
@@ -86,47 +84,44 @@ flowchart TD
 ## 디렉토리 구조
 
 ```
-Assets/
-├── Scenes/                     # Presentation — 씬 파일
-│   ├── MainMenu.unity
-│   ├── Dungeon.unity
-│   └── MetaProgress.unity
-├── UI/                         # Presentation — UI Prefab
-│   ├── BattleHUD.prefab
-│   └── RunResult.prefab
-├── Scripts/
-│   ├── ViewModels/             # ViewModel
-│   │   ├── BattleViewModel.cs
-│   │   ├── DungeonViewModel.cs
-│   │   └── MetaViewModel.cs
-│   ├── Domain/                 # Domain — 핵심 게임 규칙
-│   │   ├── AutoBattleEngine.cs
-│   │   ├── DungeonGenerator.cs
-│   │   └── BalanceConfig.cs
-│   └── Data/                   # Data — 저장·SO
-│       ├── SaveManager.cs
-│       └── MetaUnlockData.cs
-└── SO/                         # ScriptableObject 데이터 정의
-    ├── CharacterDataSO.asset
-    ├── SkillDataSO.asset
-    └── RelicDataSO.asset
+lib/
+├── main.dart
+├── app.dart
+├── presentation/             # Presentation
+│   ├── screens/
+│   │   ├── main_menu_screen.dart
+│   │   ├── dungeon_screen.dart
+│   │   └── meta_screen.dart
+│   └── widgets/
+│       └── battle_hud.dart
+├── application/              # ViewModel
+│   ├── battle_view_model.dart
+│   ├── dungeon_view_model.dart
+│   └── meta_view_model.dart
+├── domain/                   # Domain
+│   ├── auto_battle_engine.dart
+│   ├── dungeon_generator.dart
+│   └── balance_config.dart
+└── data/                     # Data
+    ├── save_repository.dart
+    └── local_data_source.dart
 ```
 
 ---
 
-## 새 기능 추가 시 파일 위치 판단
+## 새 기능 추가 시 파일 위치
 
-| 추가하려는 것 | 위치 | 예시 |
-|-------------|------|------|
-| 새 화면 / UI | `Assets/Scenes` 또는 `Assets/UI` | `DungeonResultScreen.unity` |
-| 화면 상태·흐름 로직 | `Assets/Scripts/ViewModels` | `MetaProgressViewModel.cs` |
-| 게임 규칙·밸런스 수치 | `Assets/Scripts/Domain` | `DungeonGenerator.cs` |
-| 저장·불러오기·데이터 정의 | `Assets/Scripts/Data` 또는 `Assets/SO` | `SaveManager.cs` |
+| 추가하려는 것 | 위치 |
+|-------------|------|
+| 새 화면 | `lib/presentation/screens/` |
+| 화면 상태·흐름 로직 | `lib/application/` |
+| 게임 규칙·밸런스 수치 | `lib/domain/` |
+| 저장·불러오기 | `lib/data/` |
 
 ---
 
-## 미결 설계 이슈
+## 미결 이슈
 
-- [ ] 씬 전환 방식 — Additive Load vs Single Load 결정 필요
-- [ ] 던전 생성 알고리즘 — BSP vs Cellular Automata 비교 후 결정
-- [ ] 이펙트·파티클 — 성능 예산 결정 후 품질 수준 확정
+- [ ] 상태관리 라이브러리 확정 — Provider vs Riverpod (ADR-0002)
+- [ ] 로컬 저장 방식 확정 — SharedPreferences vs Hive (ADR-0003)
+- [ ] 던전 생성 알고리즘 — BSP vs Cellular Automata

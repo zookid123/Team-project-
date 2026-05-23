@@ -8,12 +8,15 @@
 
 ## 플랫폼
 
-- iOS / Android (Unity 2022.3 LTS)
+- iOS / Android (**Flutter** · Dart)
 
 ## 빠른 시작
 
 ```bash
-git clone https://github.com/[팀 계정]/roguelike-dungeon-rpg.git
+git clone https://github.com/zookid123/Team-project-.git
+cd Team-project-
+flutter pub get
+flutter run
 ```
 
 → 자세한 실행 방법: [`docs/setup.md`](docs/setup.md)
@@ -26,7 +29,7 @@ git clone https://github.com/[팀 계정]/roguelike-dungeon-rpg.git
 | [`docs/architecture.md`](docs/architecture.md) | 시스템 아키텍처 & 다이어그램 |
 | [`.planning/00-vision.md`](.planning/00-vision.md) | 비전 & 문제 정의 |
 | [`.planning/01-requirements.md`](.planning/01-requirements.md) | 사용자 시나리오 & MoSCoW |
-| [`.planning/02-wbs.md`](.planning/02-wbs.md) | WBS |
+| [`.planning/02-wbs.md`](.planning/02-wbs.md) | WBS & 간트 차트 |
 | [`.planning/04-schedule.md`](.planning/04-schedule.md) | 6주 일정 |
 | [`.planning/decisions/`](.planning/decisions/) | ADR (기술 결정 기록) |
 

@@ -6,46 +6,53 @@
 
 ## 배경
 
-던전 상태·캐릭터 스탯·메타 진행 데이터를 런 간에 어떻게 관리할 것인지 결정이 필요했다.
-Unity에서 사용할 수 있는 상태 관리 방식 중 프로젝트 규모에 맞는 것을 선택해야 했다.
+던전 상태·캐릭터 스탯·메타 진행 데이터를 Flutter에서 어떻게 관리할 것인지 결정이 필요했다.
+Flutter의 상태 관리 라이브러리 중 프로젝트 규모에 맞는 것을 선택해야 했다.
 
 ## 고려한 대안
 
-### 대안 A: ScriptableObject 단독
-- 장점: Unity 네이티브, 에디터 연동 쉬움, 데이터 시각화 편리
-- 단점: 런타임 복잡한 상태 변화 관리 어려움. 씬 간 상태 전달 불편
+### 대안 A: setState (Flutter 기본)
+- 장점: 별도 라이브러리 없음, 즉시 사용 가능
+- 단점: 화면 간 상태 공유 어려움, 코드가 복잡해지면 관리 불가
 
-### 대안 B: 싱글턴 GameManager 단독
-- 장점: 익숙한 패턴, 전역 접근 쉬움
-- 단점: 싱글턴 남발 시 의존성 복잡. 테스트 어려움
+### 대안 B: Provider
+- 장점: Flutter 공식 권장, 학습 비용 낮음, 간단한 구조
+- 단점: 복잡한 상태 로직에서 ChangeNotifier가 비대해짐
 
-### 대안 C: ScriptableObject (데이터) + GameManager (런타임 상태) 분리
-- 장점: 역할 명확히 분리, 에디터에서 데이터 조작 가능, 런타임 상태 제어 명확
-- 단점: 초기 설계 시간 투자 필요. 팀 컨벤션 공유 필수
+### 대안 C: Riverpod
+- 장점: Provider 개선판, 타입 안전, 테스트 용이, 컴파일 타임 오류 감지
+- 단점: Provider보다 학습 비용 높음, 초반 설정 복잡
 
 ## 결정
 
-**ScriptableObject (데이터 정의) + GameManager (런타임 상태)** 를 분리하여 병행 사용한다.
+**Provider** 를 선택한다.
 
 ## 이유
 
-- 던전·스킬 데이터는 SO로 에디터에서 관리 → 밸런싱 작업 빠름
-- 런타임 전투 상태는 GameManager로 제어 → 역할 명확
-- 6주 프로젝트 규모에서 Clean Architecture 도입은 과도함
+- 6주 프로젝트에서 학습 비용이 낮은 것이 중요
+- Flutter 공식 문서에서 권장하는 방식
+- AI Agent의 Provider 코드 생성 품질이 높고 예제가 풍부
+- 프로젝트 규모(10화면 미만)에서 Riverpod의 복잡성은 오버엔지니어링
 
 ## 결과
 
 **긍정:**
-- 데이터·로직 분리로 테스트 용이
-- 밸런싱 수치 조정을 에디터에서 바로 가능
-- 씬 간 상태 전달이 명확해짐
+- 빠른 학습과 즉시 적용 가능
+- 공식 문서 및 예제 풍부
+- ViewModel 패턴과 자연스럽게 연결
 
 **부정 / 제약:**
-- 초기 SO 구조 설계 시간 필요
-- 팀 간 컨벤션(어디에 무엇을 넣는지) 명시 필요
+- 복잡한 비동기 상태 처리 시 코드가 길어질 수 있음
+- 대규모 확장 시 Riverpod으로 마이그레이션 필요할 수 있음
+
+## 60초 발표 요약
+
+> "Flutter 상태관리로 setState, Provider, Riverpod을 검토했습니다.
+> 6주 프로젝트에서 학습 비용이 낮고 Flutter 공식 권장 방식인 Provider를 선택했습니다.
+> Riverpod이 더 강력하지만 현재 규모에서는 오버엔지니어링이라 판단했습니다."
 
 ## 후속 작업
 
-- [ ] CharacterDataSO, SkillDataSO, RelicDataSO 초기 구조 정의
-- [ ] GameManager 싱글턴 생성 및 씬 간 DontDestroyOnLoad 설정
-- [ ] 상태 흐름 문서화 (architecture.md에 추가)
+- [ ] pubspec.yaml에 provider 패키지 추가
+- [ ] BattleViewModel, DungeonViewModel, MetaViewModel ChangeNotifier로 구현
+- [ ] MultiProvider로 앱 최상단에서 주입
