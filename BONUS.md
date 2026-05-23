@@ -1,18 +1,51 @@
-# BONUS.md — 가산점 신청 트래킹
+# BONUS.md — 가산점 신청
 
-> 가산점 항목을 노릴 항목에 체크하고, 완료 시 증거를 링크로 남깁니다.
+## 신청 항목
 
-## 신청 예정 항목
+### A. AI Agent / 워크플로우 적극 활용 (+1점)
 
-| 항목 | 상태 | 증거 / 링크 |
-|------|------|------------|
-| ADR 3개 이상 작성 | 🔜 진행 중 | `.planning/decisions/` |
-| docs/setup.md — 5분 이내 실행 가능 | 🔜 진행 중 | `docs/setup.md` |
-| docs/architecture.md + Mermaid 다이어그램 | 🔜 진행 중 | `docs/architecture.md` |
-| 위험 체크리스트 5개 이상 | ✅ 완료 | `.planning/03-risks.md` |
-| 자동전투 + 개입 포인트 구현 (차별화 기능) | 🔜 개발 중 | - |
+**증빙:**
+- Claude AI Agent를 활용해 전체 기획 문서 자동 생성
+  - 비전·문제 정의, 사용자 시나리오 3개, MoSCoW 분류
+  - WBS 28개 작업 분해, 6주 일정 매핑
+  - ADR 3개 (프레임워크·상태관리·저장방식)
+  - 위험 체크리스트 12개 식별 및 대응 방안
+- AI Agent로 생성 후 본인이 직접 검토·수정한 커밋 이력 존재
+- `AGENTS.md` 헌법 기반으로 AI Agent 운영 일관성 유지
 
-## 메모
+---
 
-- AUTHORING.{이름}.v0.1.0.md 초안 작성 예정
-- 가산점 항목 추가 발견 시 이 파일에 계속 업데이트
+### B. 본인만의 기법 구성 (+2점)
+
+**증빙:**
+- `AUTHORING.진석.v0.1.0.md` — 단일 파일로 프로젝트 전체 문서를 부트스트랩하는 기법
+  - 비전 → 시나리오 → MoSCoW → WBS → ADR → 아키텍처 → Setup → Deploy → Testing 순서로 자동 생성
+  - 각 단계별 AI Agent 프롬프트 템플릿 포함
+  - 재사용 가능한 구조로 다음 프로젝트에도 적용 가능
+
+**말로 설명 가능한 내용:**
+> "저는 프로젝트 시작 시 단 하나의 마크다운 파일로
+> 기획부터 배포 문서까지 전체를 순서대로 생성하는 부트스트랩 기법을 만들었습니다.
+> 각 단계에서 AI Agent에게 어떤 프롬프트를 사용했는지,
+> 왜 그 순서로 진행했는지 설명할 수 있습니다."
+
+---
+
+## 미신청 항목
+
+| 항목 | 이유 |
+|------|------|
+| C. LLM Wiki (+1점) | 준비 중 |
+| D. AI Agent 리포트 발표 (+2점) | 준비 중 |
+
+---
+
+## 문서 완비 현황 (과제 5점 기준)
+
+| 단계 | 문서 | 상태 |
+|------|------|------|
+| +1 | `.planning/00-vision.md`, `.planning/01-requirements.md` | ✅ |
+| +2 | `.planning/02-wbs.md`, `.planning/04-schedule.md` | ✅ |
+| +3 | `docs/architecture.md`, `.planning/decisions/ADR-*.md` (3개) | ✅ |
+| +4 | `docs/setup.md`, `docs/deploy.md`, `docs/testing.md` | ✅ |
+| +5 | `AGENTS.md`, `README.md` 완비 | ✅ |
