@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WBS — 로그라이크 던전 RPG</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0E0F13;
+    --surface: #16181E;
+    --surface2: #1E2028;
+    --border: rgba(255,255,255,0.07);
+    --text: #E8E9EC;
+    --muted: #7A7D8C;
+    --must: #E8593C;
+    --should: #7F77DD;
+    --could: #1D9E75;
+    --wont: #555866;
+    --must-bg: rgba(232,89,60,0.1);
+    --should-bg: rgba(127,119,221,0.1);
+    --could-bg: rgba(29,158,117,0.1);
+    --wont-bg: rgba(85,88,102,0.1);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    padding: 56px 40px 40px;
+    border-bottom: 1px solid var(--border);
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  .header-tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .1em;
+    color: var(--must);
+    border: 1px solid rgba(232,89,60,.3);
+    border-radius: 4px;
+    padding: 3px 8px;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+  }
+  h1 {
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -.02em;
+    margin-bottom: 12px;
+  }
+  .subtitle {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* ─── LEGEND ─── */
+  .legend {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 20px 40px;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--muted);
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+  }
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ─── MAIN ─── */
+  main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  /* ─── SECTION ─── */
+  .section {
+    margin-bottom: 40px;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    min-width: 20px;
+  }
+  .section-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .section-total {
+    margin-left: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* ─── TASK ROWS ─── */
+  .tasks { display: flex; flex-direction: column; gap: 4px; }
+
+  .task {
+    display: grid;
+    grid-template-columns: 44px 1fr auto auto;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    background: var(--surface);
+    transition: border-color .15s, background .15s;
+    cursor: default;
+  }
+  .task:hover {
+    border-color: var(--border);
+    background: var(--surface2);
+  }
+
+  .task-id {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .task-name {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text);
+  }
+  .task-area {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+    white-space: nowrap;
+  }
+  .task-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  .badge-must   { background: var(--must-bg);   color: var(--must); }
+  .badge-should { background: var(--should-bg); color: var(--should); }
+  .badge-could  { background: var(--could-bg);  color: var(--could); }
+  .badge-wont   { background: var(--wont-bg);   color: var(--wont); }
+
+  .days {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    min-width: 24px;
+    text-align: right;
+  }
+
+  /* ─── SUMMARY BAR ─── */
+  .summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 40px;
+    padding: 24px;
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+  .summary-item { text-align: center; }
+  .summary-val {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -.02em;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .summary-lbl {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* ─── SCHEDULE STRIP ─── */
+  .schedule {
+    margin-top: 40px;
+  }
+  .week-row {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .week-row:last-child { border-bottom: none; }
+  .week-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .week-bar-wrap {
+    height: 6px;
+    background: rgba(255,255,255,.06);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .week-bar {
+    height: 100%;
+    border-radius: 3px;
+    transition: width .6s cubic-bezier(.4,0,.2,1);
+  }
+  .week-goal {
+    font-size: 12px;
+    color: var(--muted);
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 600px) {
+    header, .legend, main { padding-left: 20px; padding-right: 20px; }
+    .task { grid-template-columns: 36px 1fr auto; }
+    .task-area { display: none; }
+    .summary { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-tag">WBS — Work Breakdown Structure</div>
+  <h1>로그라이크 던전 RPG<br><span style="color:var(--muted);font-weight:300">자동전투</span></h1>
+  <p class="subtitle">플랫폼: iOS / Android (Unity 2022.3 LTS) &nbsp;·&nbsp; 총 6주 일정 &nbsp;·&nbsp; 버퍼 20% 포함</p>
+</header>
+
+<div class="legend">
+  <div class="legend-item"><div class="dot" style="background:var(--must)"></div>Must — 출시 필수</div>
+  <div class="legend-item"><div class="dot" style="background:var(--should)"></div>Should — 데모 후 추가</div>
+  <div class="legend-item"><div class="dot" style="background:var(--could)"></div>Could — 시간 여유 시</div>
+  <div class="legend-item"><div class="dot" style="background:var(--wont)"></div>Won't — 이번엔 제외</div>
+</div>
+
+<main>
+
+  <!-- 1. 사용자 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">1</span>
+      <span class="section-title">사용자 & 인증</span>
+      <span class="section-total">3d</span>
+    </div>
+    <div class="tasks">
+      <div class="task"><span class="task-id">1.1.1</span><span class="task-name">로그인 / 게스트 플레이 진입 화면</span><span class="task-area">UI</span><div class="task-right"><span class="badge badge-must">Must</span><span class="days">1d</span></div></div>
+      <div class="task"><span class="task-id">1.1.2</span><span class="task-name">프로필 & 메타 데이터 저장</span><span class="task-area">Data</span><div class="task-right"><span class="badge badge-must">Must</span><span class="days">2d</span></div></div>
+    </div>
+  </div>
+
+  <!-- 2. 핵심 기능 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">2</span>
+      <span class="section-title">핵심 기능</span>
+      <span class="section-total">29d</span>
+    </div>
+    <div class="tasks">
+      <div class="task"><span class="task-id">2.1.1</span><span class="task-name">자동전투 UI 화면</span><span class="task-area">Domain</span><div class="task-right"><span class="badge badge-must">Must</span><span class="days">3d</span></div></div>
+      <div class="task"><span class="task-id">2.1.2</span><span class="task-name">자동전투 로직 — AI 행동 패턴</span><span class="task-area">Domain</span><div class="task-right"><span class="badge badge-must">Must</span><span class="days">3d</span></div></div>
+      <div class="task"><span class="task-id">2.1.3</span><span class="task-name">전투 중 개입 포인트 — 스킬 발동·타겟 지정</span><span class="task-area">Domain</span><div class="task-right"><span class="badge badge-must">Must</span><span class="days">2d</span></div></div>
+      <div class="task"><span class="task-id">2.2.1</span><span class="task-name">절차적 던전 생성 알고리즘</span><span class="task-area">Domain</span><div class="task-right"><span class="badge badge-must">Must</span><span class="days">3d</span></div></div>
+      <div class="task"><span class="task-id">2.2.2</span><span class="task-name">층수 & 적 배치 밸런싱</span><span class="task-area">Domain</span><div class="task-right"><span class="badge badge-must">Must</span><span class="days">2d</span></div></div>
+      <div class="task"><span class="task-id">2.3.1</span><span class="task-name">캐릭터 스킬 트리 UI</span><span class="task-area">UI</span><div class="task-right"><span class="badge badge-must">Must</span><span class="days">2d</span></div></div>
+      <div class="task"><span class="task-id">2.3.2</span><span class="task-name">장비 & 아이템 로직</span><span class="task-area">Domain</span><div class="task-right"><span class="badge badge-must">Must</span><span class="days">2d</span></div></div>
+      <div class="task"><span class="task-id">2.4.1</span><span class="task-name">런 완결 & 보상 화면</span><span class="task-area">UI</span><div class="task-right"><span class="badge badge-must">Must</span><span class="days">1d</span></div></div>
+      <div class="task"><span class="task-id">2.4.2</span><span class="task-name">메타 진행 — 영구 해금 시스템</span><span class="task-area">Domain</span><div class="task-right"><span class="badge badge-must">Must</span><span class="days">3d</span></div></div>
+      <div class="task"><span class="task-id">2.5.1</span><span class="task-name">유물 & 시너지 시스템</span><span class="task-area">Domain</span><div class="task-right"><span class="badge badge-should">Should</span><span class="days">3d</span></div></div>
+      <div class="task"><span class="task-id">2.5.2</span><span class="task-name">온보딩 튜토리얼 — 첫 3런 구성</span><span class="task-area">UI</span><div class="task-right"><span class="badge badge-should">Should</span><span class="days">2d</span></div></div>
+      <div class="task"><span class="task-id">2.5.3</span><span class="task-name">난이도 선택 UI & 로직</span><span class="task-area">UI</span><div class="task-right"><span class="badge badge-should">Should</span><span class="days">1d</span></div></div>
+      <div class="task"><span class="task-id">2.5.4</span><span class="task-name">빠른 재시작 UI — 3탭 이내</span><span class="task-area">UI</span><div class="task-right"><span class="badge badge-should">Should</span><span class="days">1d</span></div></div>
+      <div class="task"><span class="task-id">2.6.1</span><span class="task-name">전투 로그 & DPS 통계 화면</span><span class="task-area">UI</span><div class="task-right"><span class="badge badge-could">Could</span><span class="days">2d</span></div></div>
+      <div class="task"><span class="task-id">2.6.2</span><span class="task-name">빌드 저장 & 즐겨찾기</span><span class="task-area">Data</span><div class="task-right"><span class="badge badge-could">Could</span><span class="days">1d</span></div></div>
+      <div class="task"><span class="task-id">2.6.3</span><span class="task-name">빌드 추천 힌트 UI</span><span class="task-area">UI</span><div class="task-right"><span class="badge badge-could">Could</span><span class="days">1d</span></div></div>
+      <div class="task"><span class="task-id">2.6.4</span><span class="task-name">업적 & 도전 과제</span><span class="task-area">Domain</span><div class="task-right"><span class="badge badge-could">Could</span><span class="days">2d</span></div></div>
+    </div>
+  </div>
+
+  <!-- 3. 데이터 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">3</span>
+      <span class="section-title">데이터 / 저장</span>
+      <span class="section-total">5d</span>
+    </div>
+    <div class="tasks">
+      <div class="task"><span class="task-id">3.1.1</span><span class="task-name">데이터 모델 설계 — 캐릭터·던전·메타</span><span class="task-area">Data</span><div class="task-right"><span class="badge badge-must">Must</span><span class="days">2d</span></div></div>
+      <div class="task"><span class="task-id">3.1.2</span><span class="task-name">로컬 저장 & 캐시 — JSON</span><span class="task-area">Data</span><div class="task-right"><span class="badge badge-must">Must</span><span class="days">1d</span></div></div>
+      <div class="task"><span class="task-id">3.2.1</span><span class="task-name">분석 & 로깅 연동</span><span class="task-area">Data</span><div class="task-right"><span class="badge badge-should">Should</span><span class="days">1d</span></div></div>
+      <div class="task"><span class="task-id">3.2.2</span><span class="task-name">크래시 리포팅</span><span class="task-area">Data</span><div class="task-right"><span class="badge badge-should">Should</span><span class="days">1d</span></div></div>
+    </div>
+  </div>
+
+  <!-- 4. 운영 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">4</span>
+      <span class="section-title">운영 / 배포</span>
+      <span class="section-total">4d</span>
+    </div>
+    <div class="tasks">
+      <div class="task"><span class="task-id">4.1.1</span><span class="task-name">빌드 스크립트 — iOS / Android</span><span class="task-area">DevOps</span><div class="task-right"><span class="badge badge-must">Must</span><span class="days">2d</span></div></div>
+      <div class="task"><span class="task-id">4.1.2</span><span class="task-name">서명 & 인증서 설정</span><span class="task-area">DevOps</span><div class="task-right"><span class="badge badge-must">Must</span><span class="days">1d</span></div></div>
+      <div class="task"><span class="task-id">4.1.3</span><span class="task-name">배포 채널 — TestFlight / Play Beta</span><span class="task-area">DevOps</span><div class="task-right"><span class="badge badge-should">Should</span><span class="days">1d</span></div></div>
+    </div>
+  </div>
+
+  <!-- 5. 문서 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">5</span>
+      <span class="section-title">문서 / 발표</span>
+      <span class="section-total">6d</span>
+    </div>
+    <div class="tasks">
+      <div class="task"><span class="task-id">5.1.1</span><span class="task-name">README & 설치 가이드</span><span class="task-area">Docs</span><div class="task-right"><span class="badge badge-must">Must</span><span class="days">1d</span></div></div>
+      <div class="task"><span class="task-id">5.1.2</span><span class="task-name">docs/setup.md</span><span class="task-area">Docs</span><div class="task-right"><span class="badge badge-must">Must</span><span class="days">1d</span></div></div>
+      <div class="task"><span class="task-id">5.1.3</span><span class="task-name">docs/architecture.md</span><span class="task-area">Docs</span><div class="task-right"><span class="badge badge-must">Must</span><span class="days">1d</span></div></div>
+      <div class="task"><span class="task-id">5.2.1</span><span class="task-name">중간 발표 자료</span><span class="task-area">Docs</span><div class="task-right"><span class="badge badge-should">Should</span><span class="days">1d</span></div></div>
+      <div class="task"><span class="task-id">5.3.1</span><span class="task-name">최종 발표 자료</span><span class="task-area">Docs</span><div class="task-right"><span class="badge badge-should">Should</span><span class="days">2d</span></div></div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summary">
+    <div class="summary-item">
+      <div class="summary-val" style="color:var(--must)">23d</div>
+      <div class="summary-lbl">Must</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-val" style="color:var(--should)">12d</div>
+      <div class="summary-lbl">Should</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-val" style="color:var(--could)">6d</div>
+      <div class="summary-lbl">Could</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-val" style="color:var(--muted)">47d</div>
+      <div class="summary-lbl">총합 (버퍼 20%)</div>
+    </div>
+  </div>
+
+  <!-- SCHEDULE -->
+  <div class="schedule" style="margin-top:48px">
+    <div class="section-header" style="margin-bottom:20px">
+      <span class="section-num"></span>
+      <span class="section-title">6주 일정</span>
+    </div>
+    <div class="week-row">
+      <span class="week-label">10주차</span>
+      <div class="week-bar-wrap"><div class="week-bar" style="width:15%;background:var(--muted)"></div></div>
+      <span class="week-goal">기획·일정 수립</span>
+    </div>
+    <div class="week-row">
+      <span class="week-label">11주차</span>
+      <div class="week-bar-wrap"><div class="week-bar" style="width:30%;background:var(--should)"></div></div>
+      <span class="week-goal">설계·환경 구축</span>
+    </div>
+    <div class="week-row">
+      <span class="week-label">12주차</span>
+      <div class="week-bar-wrap"><div class="week-bar" style="width:60%;background:var(--must)"></div></div>
+      <span class="week-goal">핵심 기능 1 + 중간발표</span>
+    </div>
+    <div class="week-row">
+      <span class="week-label">13주차</span>
+      <div class="week-bar-wrap"><div class="week-bar" style="width:85%;background:var(--must)"></div></div>
+      <span class="week-goal">핵심 기능 2 + 테스트</span>
+    </div>
+    <div class="week-row">
+      <span class="week-label">14주차</span>
+      <div class="week-bar-wrap"><div class="week-bar" style="width:95%;background:var(--could)"></div></div>
+      <span class="week-goal">마감·배포·문서</span>
+    </div>
+    <div class="week-row">
+      <span class="week-label">15주차</span>
+      <div class="week-bar-wrap"><div class="week-bar" style="width:100%;background:var(--should)"></div></div>
+      <span class="week-goal">최종 발표</span>
+    </div>
+  </div>
+
+</main>
+</body>
+</html>
