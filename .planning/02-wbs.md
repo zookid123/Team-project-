@@ -7,33 +7,34 @@
 ```mermaid
 gantt
   title 로그라이크 던전 RPG — 6주 일정
-  dateFormat  X
-  axisFormat  %s주차
+  dateFormat YYYY-MM-DD
+  tickInterval 1week
+  weekday monday
+  axisFormat %m/%d
 
   section 📋 기획·설계
-  비전·요구사항·WBS·일정       :done,    t1,  10, 11
-  아키텍처 설계 & ADR 작성      :done,    t2,  11, 12
-  Hello World 빌드 & 환경 세팅  :done,    t3,  11, 12
-  docs/setup & architecture     :done,    t4,  11, 12
+  비전·요구사항·WBS·일정        :done,    2026-05-12, 1w
+  아키텍처 설계 & ADR           :done,    2026-05-19, 1w
+  Hello World 빌드              :done,    2026-05-19, 1w
 
-  section ⚔️ 핵심 기능 (Must)
-  자동전투 UI + 로직             :active,  t5,  12, 13
-  전투 중 개입 포인트            :active,  t6,  12, 13
-  절차적 던전 생성 알고리즘      :active,  t7,  12, 13
-  캐릭터 스킬 & 장비 시스템     :         t8,  13, 14
-  메타 진행 (영구 해금)          :         t9,  13, 14
-  빌드 & 배포                    :         t10, 14, 15
+  section ⚔️ 핵심기능 Must
+  자동전투 UI + 로직             :active,  2026-05-26, 1w
+  전투 중 개입 포인트            :active,  2026-05-26, 1w
+  절차적 던전 생성               :active,  2026-05-26, 10d
+  캐릭터 스킬 & 장비             :         2026-06-02, 1w
+  메타 진행 영구 해금            :         2026-06-02, 1w
+  빌드 & 배포                    :         2026-06-09, 1w
 
-  section 🔵 Should 기능
-  유물 & 시너지 시스템           :         t11, 13, 15
-  온보딩 튜토리얼                :         t12, 14, 15
-  난이도 선택 & 빠른 재시작      :         t13, 14, 15
-  중간발표 자료                  :         t14, 12, 13
-  최종발표 자료                  :         t15, 14, 16
+  section 🔵 Should
+  유물 & 시너지 시스템           :         2026-06-02, 10d
+  온보딩 튜토리얼                :         2026-06-09, 1w
+  난이도 선택 & 재시작 UI        :         2026-06-09, 3d
+  중간발표 자료                  :         2026-05-26, 1w
+  최종발표 자료                  :         2026-06-09, 2w
 
-  section 🟢 Could 기능
-  전투 로그 & DPS 통계           :         t16, 15, 16
-  업적 & 도전 과제               :         t17, 15, 16
+  section 🟢 Could
+  전투 로그 & DPS 통계           :         2026-06-16, 1w
+  업적 & 도전 과제               :         2026-06-16, 1w
 ```
 
 ---
@@ -47,7 +48,6 @@ gantt
 | 1.1 | 비전·요구사항·WBS·일정 | 3d | 10주차 |
 | 1.2 | 아키텍처 설계 & ADR 작성 | 2d | 11주차 |
 | 1.3 | Hello World 빌드 & 환경 세팅 | 2d | 11주차 |
-| 1.4 | docs/setup.md & architecture.md | 1d | 11주차 |
 | 2.1 | 자동전투 UI + 로직 | 3d | 12주차 |
 | 2.2 | 전투 중 개입 포인트 (스킬·타겟) | 2d | 12주차 |
 | 2.3 | 절차적 던전 생성 알고리즘 | 3d | 12~13주차 |
