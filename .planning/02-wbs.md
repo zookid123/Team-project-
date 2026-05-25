@@ -1,6 +1,6 @@
 # WBS — 로그라이크 던전 RPG
 
-> 플랫폼: iOS / Android (Unity 2022.3 LTS) · 10주차 ~ 15주차
+> 플랫폼: iOS / Android (Flutter 3.x · Dart) · 10주차 ~ 15주차
 
 ## 간트 차트
 
