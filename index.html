@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WBS — 로그라이크 던전 RPG</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#F8F7F4;--surface:#FFFFFF;--border:#E8E6E0;
+    --text:#1A1A1A;--muted:#888580;
+    --must:#E8593C;--should:#7F77DD;--could:#1D9E75;
+    --must-bg:rgba(232,89,60,0.13);--should-bg:rgba(127,119,221,0.13);--could-bg:rgba(29,158,117,0.13);
+    --line:rgba(0,0,0,0.05);
+  }
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:48px 40px 80px}
+  .header{margin-bottom:32px}
+  .tag{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  h1{font-size:26px;font-weight:600;letter-spacing:-.02em;margin-bottom:4px}
+  .sub{font-size:13px;color:var(--muted)}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:28px}
+  .li{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+  .ld{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+
+  /* GANTT */
+  .gw{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+  .gh{display:grid;grid-template-columns:200px 1fr;border-bottom:1px solid var(--border);background:#F2F1ED}
+  .ghl{padding:10px 14px;font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;border-right:1px solid var(--border)}
+  .whs{display:grid;grid-template-columns:repeat(6,1fr)}
+  .wh{padding:8px 0;text-align:center;font-size:11px;font-weight:500;color:var(--muted);border-right:1px solid var(--border)}
+  .wh:last-child{border-right:none}
+  .wh span{display:block;font-size:10px;color:#BBBBBB;margin-top:1px}
+
+  /* section row */
+  .sr{display:grid;grid-template-columns:200px 1fr;background:#F7F6F2;border-bottom:1px solid var(--border)}
+  .sl{padding:7px 14px;font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);border-right:1px solid var(--border);display:flex;align-items:center;gap:5px}
+  .sg{display:grid;grid-template-columns:repeat(6,1fr)}
+  .sgc{border-right:1px solid var(--line)}
+  .sgc:last-child{border-right:none}
+
+  /* task row */
+  .tr{display:grid;grid-template-columns:200px 1fr;border-bottom:1px solid var(--border);transition:background .1s}
+  .tr:last-child{border-bottom:none}
+  .tr:hover{background:#FAFAF8}
+  .tl{padding:8px 14px;font-size:12px;border-right:1px solid var(--border);display:flex;align-items:center;gap:7px;line-height:1.35}
+  .tid{font-family:'DM Mono',monospace;font-size:10px;color:#CCCCCC;min-width:28px;flex-shrink:0}
+  .bg{display:grid;grid-template-columns:repeat(6,1fr);align-items:center;min-height:38px;position:relative}
+  .bc{height:100%;border-right:1px solid var(--line);position:relative}
+  .bc:last-child{border-right:none}
+
+  /* bar */
+  .bar{position:absolute;top:50%;transform:translateY(-50%);height:18px;border-radius:3px;display:flex;align-items:center;padding:0 7px;font-size:10px;font-weight:500;white-space:nowrap;overflow:hidden;z-index:1}
+  .bm{background:var(--must-bg);color:var(--must)}
+  .bs{background:var(--should-bg);color:var(--should)}
+  .bc2{background:var(--could-bg);color:var(--could)}
+
+  /* summary */
+  .sum{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:20px}
+  .sc{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:10px}
+  .sv{font-size:20px;font-weight:600;letter-spacing:-.02em;line-height:1}
+  .sm{font-size:11px;color:var(--muted);margin-top:2px}
+
+  @media(max-width:640px){
+    body{padding:24px 16px 60px}
+    .gh,.sr,.tr{grid-template-columns:120px 1fr}
+    .tid{display:none}
+    .sum{grid-template-columns:repeat(2,1fr)}
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="tag">WBS / Gantt Chart</div>
+  <h1>로그라이크 던전 RPG — 자동전투</h1>
+  <p class="sub">iOS / Android · Unity 2022.3 LTS · 10주차 ~ 15주차</p>
+</div>
+
+<div class="legend">
+  <div class="li"><div class="ld" style="background:var(--must)"></div>Must</div>
+  <div class="li"><div class="ld" style="background:var(--should)"></div>Should</div>
+  <div class="li"><div class="ld" style="background:var(--could)"></div>Could</div>
+</div>
+
+<div class="gw">
+
+  <!-- HEADER -->
+  <div class="gh">
+    <div class="ghl">작업</div>
+    <div class="whs">
+      <div class="wh">10주차<span>기획</span></div>
+      <div class="wh">11주차<span>설계·환경</span></div>
+      <div class="wh">12주차<span>핵심기능1</span></div>
+      <div class="wh">13주차<span>핵심기능2</span></div>
+      <div class="wh">14주차<span>마감·배포</span></div>
+      <div class="wh">15주차<span>최종발표</span></div>
+    </div>
+  </div>
+
+  <!-- 기획·설계 -->
+  <div class="sr"><div class="sl">📋 기획 &amp; 설계</div><div class="sg"><div class="sgc"></div><div class="sgc"></div><div class="sgc"></div><div class="sgc"></div><div class="sgc"></div><div class="sgc"></div></div></div>
+
+  <div class="tr"><div class="tl"><span class="tid">1.1</span>비전·요구사항·WBS·일정</div><div class="bg">
+    <div class="bc" style="position:relative"><div class="bar bm" style="left:5%;right:5%">기획 문서</div></div>
+    <div class="bc"></div><div class="bc"></div><div class="bc"></div><div class="bc"></div><div class="bc"></div>
+  </div></div>
+
+  <div class="tr"><div class="tl"><span class="tid">1.2</span>아키텍처 설계 &amp; ADR 작성</div><div class="bg">
+    <div class="bc"></div>
+    <div class="bc" style="position:relative"><div class="bar bm" style="left:5%;right:5%">설계 확정</div></div>
+    <div class="bc"></div><div class="bc"></div><div class="bc"></div><div class="bc"></div>
+  </div></div>
+
+  <div class="tr"><div class="tl"><span class="tid">1.3</span>Hello World 빌드 &amp; 환경 세팅</div><div class="bg">
+    <div class="bc"></div>
+    <div class="bc" style="position:relative"><div class="bar bm" style="left:5%;right:5%">빌드 성공</div></div>
+    <div class="bc"></div><div class="bc"></div><div class="bc"></div><div class="bc"></div>
+  </div></div>
+
+  <!-- 핵심 기능 Must -->
+  <div class="sr"><div class="sl">⚔️ 핵심 기능 (Must)</div><div class="sg"><div class="sgc"></div><div class="sgc"></div><div class="sgc"></div><div class="sgc"></div><div class="sgc"></div><div class="sgc"></div></div></div>
+
+  <div class="tr"><div class="tl"><span class="tid">2.1</span>자동전투 UI + 로직</div><div class="bg">
+    <div class="bc"></div><div class="bc"></div>
+    <div class="bc" style="position:relative"><div class="bar bm" style="left:5%;right:5%">전투 루프</div></div>
+    <div class="bc"></div><div class="bc"></div><div class="bc"></div>
+  </div></div>
+
+  <div class="tr"><div class="tl"><span class="tid">2.2</span>전투 중 개입 포인트 (스킬·타겟)</div><div class="bg">
+    <div class="bc"></div><div class="bc"></div>
+    <div class="bc" style="position:relative"><div class="bar bm" style="left:50%;right:5%">개입 포인트</div></div>
+    <div class="bc" style="position:relative"><div class="bar bm" style="left:5%;right:55%"></div></div>
+    <div class="bc"></div><div class="bc"></div>
+  </div></div>
+
+  <div class="tr"><div class="tl"><span class="tid">2.3</span>절차적 던전 생성 알고리즘</div><div class="bg">
+    <div class="bc"></div><div class="bc"></div>
+    <div class="bc" style="position:relative"><div class="bar bm" style="left:5%;right:5%">생성 기초</div></div>
+    <div class="bc" style="position:relative"><div class="bar bm" style="left:5%;right:50%">밸런싱</div></div>
+    <div class="bc"></div><div class="bc"></div>
+  </div></div>
+
+  <div class="tr"><div class="tl"><span class="tid">2.4</span>캐릭터 스킬 &amp; 장비 시스템</div><div class="bg">
+    <div class="bc"></div><div class="bc"></div><div class="bc"></div>
+    <div class="bc" style="position:relative"><div class="bar bm" style="left:5%;right:5%">스킬·장비</div></div>
+    <div class="bc"></div><div class="bc"></div>
+  </div></div>
+
+  <div class="tr"><div class="tl"><span class="tid">2.5</span>런 완결 &amp; 메타 진행 (영구 해금)</div><div class="bg">
+    <div class="bc"></div><div class="bc"></div><div class="bc"></div>
+    <div class="bc" style="position:relative"><div class="bar bm" style="left:50%;right:5%">메타 진행</div></div>
+    <div class="bc" style="position:relative"><div class="bar bm" style="left:5%;right:55%"></div></div>
+    <div class="bc"></div>
+  </div></div>
+
+  <!-- Should -->
+  <div class="sr"><div class="sl">🔵 Should 기능</div><div class="sg"><div class="sgc"></div><div class="sgc"></div><div class="sgc"></div><div class="sgc"></div><div class="sgc"></div><div class="sgc"></div></div></div>
+
+  <div class="tr"><div class="tl"><span class="tid">3.1</span>유물 &amp; 시너지 시스템</div><div class="bg">
+    <div class="bc"></div><div class="bc"></div><div class="bc"></div><div class="bc"></div>
+    <div class="bc" style="position:relative"><div class="bar bs" style="left:5%;right:5%">유물·시너지</div></div>
+    <div class="bc"></div>
+  </div></div>
+
+  <div class="tr"><div class="tl"><span class="tid">3.2</span>온보딩 튜토리얼 (첫 3런)</div><div class="bg">
+    <div class="bc"></div><div class="bc"></div><div class="bc"></div><div class="bc"></div>
+    <div class="bc" style="position:relative"><div class="bar bs" style="left:5%;right:5%">튜토리얼</div></div>
+    <div class="bc"></div>
+  </div></div>
+
+  <div class="tr"><div class="tl"><span class="tid">3.3</span>난이도 선택 &amp; 빠른 재시작</div><div class="bg">
+    <div class="bc"></div><div class="bc"></div><div class="bc"></div><div class="bc"></div>
+    <div class="bc" style="position:relative"><div class="bar bs" style="left:50%;right:5%">난이도</div></div>
+    <div class="bc"></div>
+  </div></div>
+
+  <!-- Could -->
+  <div class="sr"><div class="sl">🟢 Could 기능</div><div class="sg"><div class="sgc"></div><div class="sgc"></div><div class="sgc"></div><div class="sgc"></div><div class="sgc"></div><div class="sgc"></div></div></div>
+
+  <div class="tr"><div class="tl"><span class="tid">4.1</span>전투 로그 &amp; DPS 통계</div><div class="bg">
+    <div class="bc"></div><div class="bc"></div><div class="bc"></div><div class="bc"></div><div class="bc"></div>
+    <div class="bc" style="position:relative"><div class="bar bc2" style="left:5%;right:40%">통계</div></div>
+  </div></div>
+
+  <div class="tr"><div class="tl"><span class="tid">4.2</span>업적 &amp; 도전 과제</div><div class="bg">
+    <div class="bc"></div><div class="bc"></div><div class="bc"></div><div class="bc"></div><div class="bc"></div>
+    <div class="bc" style="position:relative"><div class="bar bc2" style="left:40%;right:5%">업적</div></div>
+  </div></div>
+
+  <!-- 배포·문서 -->
+  <div class="sr"><div class="sl">🚀 배포 &amp; 문서</div><div class="sg"><div class="sgc"></div><div class="sgc"></div><div class="sgc"></div><div class="sgc"></div><div class="sgc"></div><div class="sgc"></div></div></div>
+
+  <div class="tr"><div class="tl"><span class="tid">5.1</span>docs/setup.md &amp; architecture.md</div><div class="bg">
+    <div class="bc"></div>
+    <div class="bc" style="position:relative"><div class="bar bm" style="left:5%;right:5%">문서 작성</div></div>
+    <div class="bc"></div><div class="bc"></div><div class="bc"></div><div class="bc"></div>
+  </div></div>
+
+  <div class="tr"><div class="tl"><span class="tid">5.2</span>빌드 &amp; 배포 (TestFlight / Play Beta)</div><div class="bg">
+    <div class="bc"></div><div class="bc"></div><div class="bc"></div><div class="bc"></div>
+    <div class="bc" style="position:relative"><div class="bar bm" style="left:5%;right:5%">배포</div></div>
+    <div class="bc"></div>
+  </div></div>
+
+  <!-- 발표 -->
+  <div class="sr"><div class="sl">🎤 발표</div><div class="sg"><div class="sgc"></div><div class="sgc"></div><div class="sgc"></div><div class="sgc"></div><div class="sgc"></div><div class="sgc"></div></div></div>
+
+  <div class="tr"><div class="tl"><span class="tid">6.1</span>중간 발표 자료 준비</div><div class="bg">
+    <div class="bc"></div><div class="bc"></div>
+    <div class="bc" style="position:relative"><div class="bar bs" style="left:50%;right:5%">중간발표</div></div>
+    <div class="bc"></div><div class="bc"></div><div class="bc"></div>
+  </div></div>
+
+  <div class="tr"><div class="tl"><span class="tid">6.2</span>최종 발표 자료 &amp; 회고</div><div class="bg">
+    <div class="bc"></div><div class="bc"></div><div class="bc"></div><div class="bc"></div>
+    <div class="bc" style="position:relative"><div class="bar bs" style="left:5%;right:5%">발표 준비</div></div>
+    <div class="bc" style="position:relative"><div class="bar bs" style="left:5%;right:5%">최종 발표</div></div>
+  </div></div>
+
+</div>
+
+<!-- SUMMARY -->
+<div class="sum">
+  <div class="sc"><div class="ld" style="background:var(--must);border-radius:2px;width:10px;height:10px;flex-shrink:0"></div><div><div class="sv" style="color:var(--must)">23d</div><div class="sm">Must</div></div></div>
+  <div class="sc"><div class="ld" style="background:var(--should);border-radius:2px;width:10px;height:10px;flex-shrink:0"></div><div><div class="sv" style="color:var(--should)">12d</div><div class="sm">Should</div></div></div>
+  <div class="sc"><div class="ld" style="background:var(--could);border-radius:2px;width:10px;height:10px;flex-shrink:0"></div><div><div class="sv" style="color:var(--could)">6d</div><div class="sm">Could</div></div></div>
+  <div class="sc"><div class="ld" style="background:#AAA;border-radius:2px;width:10px;height:10px;flex-shrink:0"></div><div><div class="sv" style="color:#888">47d</div><div class="sm">총합 (버퍼 20%)</div></div></div>
+</div>
+
+</body>
+</html>
