@@ -1,0 +1,43 @@
+## 시스템 아키텍처
+
+```mermaid
+graph TD
+    subgraph Presentation["🎮 Presentation Layer"]
+        A1[DungeonScreen]
+        A2[MainMenuScreen]
+        A3[GameOverScreen]
+        A4[HeroWidget / EnemyWidget]
+    end
+
+    subgraph Application["⚙️ Application Layer"]
+        B1[GameViewModel]
+        B2[DungeonUseCase]
+        B3[CombatUseCase]
+        B4[ItemUseCase]
+    end
+
+    subgraph Domain["🧠 Domain Layer"]
+        C1[Hero / Enemy Entity]
+        C2[DungeonGeneratorService]
+        C3[CombatRuleService]
+        C4[ItemDropService]
+    end
+
+    subgraph Data["💾 Data Layer"]
+        D1[SaveRepository]
+        D2[LocalDB - SharedPreferences]
+        D3[AssetLoader - JSON]
+    end
+
+    A1 & A2 & A3 --> B1
+    A4 --> B1
+    B1 --> B2 & B3 & B4
+    B2 --> C2
+    B3 --> C3
+    B4 --> C4
+    B2 & B3 & B4 --> C1
+    B2 --> D1
+    D1 --> D2
+    C2 --> D3
+    C4 --> D3
+```
