@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "59930507468",
+    "project_id": "djlog-2603b",
+    "storage_bucket": "djlog-2603b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:59930507468:android:41d46ae1ddf01222f0aa69",
+        "android_client_info": {
+          "package_name": "com.example.app_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCte0XKtwrUIVpLqyEU_Ea_efvYq3YScqE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
