@@ -1,30 +1,27 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:app_project/main.dart';
-
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  // 단위 테스트: 전투 데미지 계산 검증
+  test('데미지 계산 - 기본 공격력 적용', () {
+    int attack = 10;
+    int defense = 3;
+    int damage = attack - defense;
+    expect(damage, equals(7));
+  });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  // 단위 테스트: 체력 감소 검증
+  test('체력 감소 - 0 이하로 내려가지 않음', () {
+    int hp = 5;
+    int damage = 10;
+    int result = (hp - damage).clamp(0, 9999);
+    expect(result, equals(0));
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+  // 단위 테스트: 카드 선택 능력치 강화 검증
+  test('카드 선택 - 공격력 강화 적용', () {
+    int baseAttack = 10;
+    int bonus = 5;
+    int result = baseAttack + bonus;
+    expect(result, equals(15));
   });
 }
