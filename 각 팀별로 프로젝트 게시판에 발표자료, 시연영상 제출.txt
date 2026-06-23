@@ -1,0 +1,7 @@
+각 팀별로 프로젝트 게시판에 발표자료, 시연영상 제출
+구현된 프로그램 URL, 관리자 id, pw, 사용자 id, pw 제출
+과제방에 팀원평가 제출 (1: 제일 기여도 높은사람, 2, 3, 4)
+
+
+
+https://student.shingu.ac.kr/eclass/clas/room/homework/homeworkDetail?reportSeq=33701

@@ -294,7 +294,7 @@ class _BattleScreenState extends State<BattleScreen>
 
           // 배속 버튼 (좌측 상단)
           Positioned(
-            top: 40,
+            top: 70,
             left: 20,
             child: GestureDetector(
               onTap: () {
@@ -323,7 +323,7 @@ class _BattleScreenState extends State<BattleScreen>
 
           // 설정 버튼 (우측 상단)
           Positioned(
-            top: 40,
+            top: 70,
             right: 20,
             child: IconButton(
               icon: const Icon(Icons.settings, color: Colors.white, size: 30),
@@ -476,11 +476,11 @@ class _BattleScreenState extends State<BattleScreen>
       String atkImagePath = 'assets/character_atk_m${_playerAtkFrame + 1}.png';
       
       imageWidget = Padding(
-        padding: const EdgeInsets.only(bottom: 50, left: 10), // 바닥에서 50 위로, 왼쪽에서 10 오른쪽으로 이동
+        padding: const EdgeInsets.only(bottom: 75, left: 10), // 하단 여백을 10 더 늘림
         child: Image.asset(
           atkImagePath,
-          width: 180,
-          height: 180,
+          width: 130,
+          height: 130,
           fit: BoxFit.contain,
         ),
       );

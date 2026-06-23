@@ -166,6 +166,7 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
       barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
+          scrollable: true, // 키보드 팝업 시 스크롤 가능하게 설정
           backgroundColor: Colors.white.withOpacity(0.95),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(25),
